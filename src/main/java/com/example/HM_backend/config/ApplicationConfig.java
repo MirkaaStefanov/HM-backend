@@ -3,7 +3,10 @@ package com.example.HM_backend.config;
 
 import com.example.HM_backend.exceptions.user.UserNotFoundException;
 import com.example.HM_backend.models.baseEntity.BaseEntity;
+import com.example.HM_backend.models.dto.ProductDTO;
 import com.example.HM_backend.models.dto.common.BaseDTO;
+import com.example.HM_backend.models.entity.Product;
+import com.example.HM_backend.models.entity.ProductImage;
 import com.example.HM_backend.repositories.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -14,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
+import org.modelmapper.spi.MappingContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
@@ -29,6 +33,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Base64;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Configuration class for defining beans related to application setup, such as ModelMapper, ObjectMapper,
@@ -81,15 +87,21 @@ public class ApplicationConfig {
         Converter<byte[], String> toBase64 = ctx ->
                 ctx.getSource() != null ? Base64.getEncoder().encodeToString(ctx.getSource()) : null;
 
-//         FirstProduct mappings
-//        modelMapper.createTypeMap(FirstProduct.class, FirstProductDTO.class)
-//                .addMappings(mapper -> {
-//                    mapper.using(toBase64).map(FirstProduct::getImage, FirstProductDTO::setImage);
-//                    mapper.skip(FirstProductDTO::setMultipartFile);
-//                });
-//
-//        modelMapper.createTypeMap(FirstProductDTO.class, FirstProduct.class)
-//                .addMappings(mapper -> mapper.skip(FirstProduct::setImage));
+        Converter<List<ProductImage>, List<String>> productImagesToStringListConverter = new Converter<List<ProductImage>, List<String>>() {
+            public List<String> convert(MappingContext<List<ProductImage>, List<String>> context) {
+                if (context.getSource() == null) {
+                    return null; // Or new ArrayList<>(); depending on desired behavior
+                }
+                return context.getSource().stream()
+                        .map(ProductImage::getBase64Image) // Uses your existing getBase64Image() method
+                        .collect(Collectors.toList());
+            }
+        };
+
+        modelMapper.createTypeMap(Product.class, ProductDTO.class)
+                .addMappings(mapper -> mapper.using(productImagesToStringListConverter)
+                        .map(Product::getImages, ProductDTO::setImageStrings));
+
 
     }
 
