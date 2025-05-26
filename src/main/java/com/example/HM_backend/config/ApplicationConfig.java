@@ -81,7 +81,7 @@ public class ApplicationConfig {
         Converter<byte[], String> toBase64 = ctx ->
                 ctx.getSource() != null ? Base64.getEncoder().encodeToString(ctx.getSource()) : null;
 
-        // FirstProduct mappings
+//         FirstProduct mappings
 //        modelMapper.createTypeMap(FirstProduct.class, FirstProductDTO.class)
 //                .addMappings(mapper -> {
 //                    mapper.using(toBase64).map(FirstProduct::getImage, FirstProductDTO::setImage);
@@ -90,7 +90,7 @@ public class ApplicationConfig {
 //
 //        modelMapper.createTypeMap(FirstProductDTO.class, FirstProduct.class)
 //                .addMappings(mapper -> mapper.skip(FirstProduct::setImage));
-//
+
     }
 
     @Bean
