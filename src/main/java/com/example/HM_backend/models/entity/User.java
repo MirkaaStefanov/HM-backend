@@ -11,7 +11,9 @@ import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 @Getter
 @Setter
@@ -43,6 +45,15 @@ public class User extends BaseEntity implements UserDetails {
     @NotNull
     @Enumerated(EnumType.STRING)
     private Provider provider;
+
+    @ManyToMany(fetch = FetchType.LAZY,
+            cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    @JoinTable(
+            name = "user_liked_products",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "product_id")
+    )
+    private List<Product> likedProducts = new ArrayList<>();
 
     @Column(name = "enabled")
     private boolean enabled;
