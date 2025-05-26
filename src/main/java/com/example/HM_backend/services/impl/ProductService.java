@@ -12,6 +12,7 @@ import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,13 +28,16 @@ public class ProductService {
     public ProductDTO save(ProductDTO productDTO) throws IOException {
         Product product = modelMapper.map(productDTO, Product.class);
         Product savedProduct = productRepository.save(product);
+        List<ProductImage> images = new ArrayList<>();
         for(String image : productDTO.getImageStrings()){
             byte[] decodedImage = Base64.getDecoder().decode(image);
             ProductImage productImage = new ProductImage();
             productImage.setProduct(savedProduct);
             productImage.setImageData(decodedImage);
+            images.add(productImage);
             productImageRepository.save(productImage);
         }
+        savedProduct.setImages(images);
         return modelMapper.map(savedProduct, ProductDTO.class);
     }
 

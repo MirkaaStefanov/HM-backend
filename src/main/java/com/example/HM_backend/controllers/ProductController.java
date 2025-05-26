@@ -31,7 +31,7 @@ public class ProductController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<ProductDTO>> findAll(@RequestHeader("Authorization") String auth) {
+    public ResponseEntity<List<ProductDTO>> findAll() {
         return ResponseEntity.ok(productService.findAll());
     }
 

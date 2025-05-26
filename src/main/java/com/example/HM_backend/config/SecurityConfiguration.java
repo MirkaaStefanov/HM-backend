@@ -45,18 +45,6 @@ public class SecurityConfiguration {
                 })
                 .sessionManagement(c -> c.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers(HttpMethod.GET, "/api/v1/finalProduct/all").hasRole("ADMIN")
-                        .requestMatchers("/api/v1/midProduct/**").hasRole("ADMIN")
-                        .requestMatchers("/api/v1/firstProduct/**").hasRole("ADMIN")
-                        .requestMatchers("/api/v1/finalProductNeed/**").hasRole("ADMIN")
-                        .requestMatchers("/api/v1/midProductNeed/**").hasRole("ADMIN")
-
-                        .requestMatchers("/api/v1/firstProductOrder/allByMaterialType").hasAnyRole("ADMIN","METALIST", "WOODER","SEWER")
-                        .requestMatchers("/api/v1/firstProductOrder/**").hasRole("ADMIN")
-                        .requestMatchers("/api/v1/midProductOrder/**").hasRole("ADMIN")
-                        .requestMatchers("/api/v1/finalProductOrder/**").hasRole("ADMIN")
-
-
 
                         .anyRequest().permitAll()
                 )
