@@ -1,7 +1,9 @@
 package com.example.HM_backend.services.impl;
 
 
+import com.example.HM_backend.models.dto.FilterCriteriaDTO;
 import com.example.HM_backend.models.dto.ProductDTO;
+import com.example.HM_backend.models.dto.ProductSpecification;
 import com.example.HM_backend.models.entity.Product;
 import com.example.HM_backend.models.entity.ProductImage;
 import com.example.HM_backend.repositories.ProductImageRepository;
@@ -9,6 +11,7 @@ import com.example.HM_backend.repositories.ProductRepository;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.crossstore.ChangeSetPersister;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -65,4 +68,37 @@ public class ProductService {
         productRepository.save(firstProduct);
     }
 
+    public List<ProductDTO> filterProducts(FilterCriteriaDTO criteria) {
+
+        Specification<Product> spec = ProductSpecification.isNotDeleted();
+
+        if (criteria.getGlobalSearchText() != null && !criteria.getGlobalSearchText().trim().isEmpty()) {
+            spec = spec.and(ProductSpecification.textContains(criteria.getGlobalSearchText()));
+        }
+
+        if (criteria.getMinPrice() != null || criteria.getMaxPrice() != null) {
+            spec = spec.and(ProductSpecification.priceBetween(criteria.getMinPrice(), criteria.getMaxPrice()));
+        }
+        if (criteria.getMinArea() != null) {
+            spec = spec.and(ProductSpecification.hasMinArea(criteria.getMinArea()));
+        }
+        if (criteria.getMinRooms() != null) {
+            spec = spec.and(ProductSpecification.hasMinRooms(criteria.getMinRooms()));
+        }
+        if (criteria.getCity() != null && !criteria.getCity().trim().isEmpty()) {
+            spec = spec.and(ProductSpecification.hasCity(criteria.getCity()));
+        }
+        if (criteria.getRegionId() != null) {
+            spec = spec.and(ProductSpecification.hasRegion(criteria.getRegionId()));
+        }
+        if (criteria.getState() != null) {
+            spec = spec.and(ProductSpecification.hasState(criteria.getState()));
+        }
+
+        List<Product> products = productRepository.findAll(spec); // Use findAll with the Specification
+
+        return products.stream()
+                .map(product -> modelMapper.map(product, ProductDTO.class))
+                .collect(Collectors.toList());
+    }
 }

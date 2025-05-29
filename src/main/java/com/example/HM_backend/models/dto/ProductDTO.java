@@ -1,6 +1,7 @@
 package com.example.HM_backend.models.dto;
 
 import com.example.HM_backend.enums.State;
+import com.example.HM_backend.models.entity.Region;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,6 +22,9 @@ public class ProductDTO {
     private double price;
     private int area;
     private State state;
+    private String city;
+    private RegionDTO region;
+    private int rooms;
     @JsonIgnore
     private List<MultipartFile> imageFiles;
     private boolean deleted;

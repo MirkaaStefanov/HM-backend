@@ -1,5 +1,7 @@
 package com.example.HM_backend.controllers;
 
+import com.example.HM_backend.enums.State;
+import com.example.HM_backend.models.dto.FilterCriteriaDTO;
 import com.example.HM_backend.models.dto.ProductDTO;
 import com.example.HM_backend.services.impl.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
@@ -49,6 +52,39 @@ public class ProductController {
     public ResponseEntity<String> delete(@PathVariable Long id, @RequestHeader("Authorization") String auth) throws ChangeSetPersister.NotFoundException {
         productService.delete(id);
         return ResponseEntity.ok("Product have been deleted successfully");
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<List<ProductDTO>> filterProducts(
+            @RequestParam(required = false) String globalSearchText,// Will be parsed to ProductType
+            @RequestParam(required = false) Double minPrice,
+            @RequestParam(required = false) Double maxPrice,
+            @RequestParam(required = false) Integer minArea,
+            @RequestParam(required = false) Integer maxArea,
+            @RequestParam(required = false) Integer minRooms,
+            @RequestParam(required = false) Integer maxRooms,
+            @RequestParam(required = false) String city,
+            @RequestParam(required = false) Long regionId,
+            @RequestParam(required = false) String state // Will be parsed to State
+    ) {
+        FilterCriteriaDTO criteria = new FilterCriteriaDTO();
+        criteria.setGlobalSearchText(globalSearchText);
+        criteria.setMinPrice(minPrice);
+        criteria.setMaxPrice(maxPrice);
+        criteria.setMinArea(minArea);
+        criteria.setMaxArea(maxArea);
+        criteria.setMinRooms(minRooms);
+        criteria.setMaxRooms(maxRooms);
+        criteria.setCity(city);
+        criteria.setRegionId(regionId);
+        if (state != null && !state.isEmpty()) {
+            try {
+                criteria.setState(State.valueOf(state.toUpperCase()));
+            } catch (IllegalArgumentException e) {
+                System.err.println("Invalid State: " + state);
+            }
+        }
+        return ResponseEntity.ok(productService.filterProducts(criteria));
     }
 
 }
