@@ -8,6 +8,5 @@ import lombok.RequiredArgsConstructor;
 public enum State {
 
     SALE,
-    RENT,
-    NEW
+    RENT
 }
