@@ -39,7 +39,7 @@ public class ProductController {
     }
 
     @GetMapping("/findById/{id}")
-    public ResponseEntity<ProductDTO> findById(@PathVariable Long id, @RequestHeader("Authorization") String auth) throws ChangeSetPersister.NotFoundException {
+    public ResponseEntity<ProductDTO> findById(@PathVariable Long id) throws ChangeSetPersister.NotFoundException {
         return ResponseEntity.ok(productService.findById(id));
     }
 
