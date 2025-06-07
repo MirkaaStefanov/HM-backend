@@ -6,12 +6,16 @@ import com.example.HM_backend.models.dto.ProductDTO;
 import com.example.HM_backend.models.dto.ProductSpecification;
 import com.example.HM_backend.models.entity.Product;
 import com.example.HM_backend.models.entity.ProductImage;
+import com.example.HM_backend.models.entity.User;
 import com.example.HM_backend.repositories.ProductImageRepository;
 import com.example.HM_backend.repositories.ProductRepository;
+import com.example.HM_backend.repositories.UserRepository;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -27,6 +31,7 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final ProductImageRepository productImageRepository;
     private final ModelMapper modelMapper;
+    private final UserRepository userRepository;
 
     public ProductDTO save(ProductDTO productDTO) throws IOException {
         Product product = modelMapper.map(productDTO, Product.class);
@@ -101,5 +106,20 @@ public class ProductService {
         return products.stream()
                 .map(product -> modelMapper.map(product, ProductDTO.class))
                 .collect(Collectors.toList());
+    }
+
+    public ProductDTO likeProduct(Long id) throws ChangeSetPersister.NotFoundException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        User authenticateUser = userRepository.findByEmail(email).orElseThrow(ChangeSetPersister.NotFoundException::new);
+        Product product = productRepository.findByIdAndDeletedFalse(id).orElseThrow(ChangeSetPersister.NotFoundException::new);
+
+        authenticateUser.getLikedProducts().add(product);
+        userRepository.save(authenticateUser);
+
+        product.getUsersWhoLikedThis().add(authenticateUser);
+        productRepository.save(product);
+
+        return modelMapper.map(product, ProductDTO.class);
     }
 }

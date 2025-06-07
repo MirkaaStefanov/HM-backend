@@ -32,6 +32,10 @@ public class ProductController {
     public ResponseEntity<ProductDTO> save(@RequestBody ProductDTO productDTO, @RequestHeader("Authorization") String auth) throws IOException {
         return ResponseEntity.ok(productService.save(productDTO));
     }
+    @PostMapping("/like/{id}")
+    public ResponseEntity<ProductDTO> like(@PathVariable Long id, @RequestHeader("Authorization") String auth) throws IOException, ChangeSetPersister.NotFoundException {
+        return ResponseEntity.ok(productService.likeProduct(id));
+    }
 
     @GetMapping("/all")
     public ResponseEntity<List<ProductDTO>> findAll() {
