@@ -41,6 +41,7 @@ public class ProductService {
             productImageRepository.save(productImage);
         }
         savedProduct.setImages(images);
+
         return modelMapper.map(savedProduct, ProductDTO.class);
     }
 
